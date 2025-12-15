@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/supabase'
+import { useSupabase } from '@/components/useSupabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -20,11 +20,14 @@ export default function ResultsPage() {
   const [data, setData] = useState<ResultData[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const supabase = useSupabase()
 
   // 获取数据
   const fetchData = async () => {
     try {
       setLoading(true)
+      if (!supabase) return
+
       const { data: results, error } = await supabase
         .from('results')
         .select('*')

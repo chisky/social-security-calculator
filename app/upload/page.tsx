@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/supabase'
+import { useSupabase } from '@/components/useSupabase'
 import * as XLSX from 'xlsx'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,6 +12,7 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false)
   const [calculating, setCalculating] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const supabase = useSupabase()
 
   // 处理文件上传
   const handleFileUpload = async (file: File, type: 'cities' | 'salaries') => {
@@ -25,6 +26,8 @@ export default function UploadPage() {
 
       if (type === 'cities') {
         // 插入城市数据
+        if (!supabase) throw new Error('Supabase client not initialized')
+
         const { error } = await supabase
           .from('cities')
           .insert(data)
@@ -33,6 +36,8 @@ export default function UploadPage() {
         setMessage({ type: 'success', text: '城市数据上传成功！' })
       } else {
         // 插入员工工资数据
+        if (!supabase) throw new Error('Supabase client not initialized')
+
         const { error } = await supabase
           .from('salaries')
           .insert(data)
@@ -63,6 +68,8 @@ export default function UploadPage() {
 
     try {
       // 1. 计算每位员工的年度月平均工资
+      if (!supabase) throw new Error('Supabase client not initialized')
+
       const { data: salaries, error: salaryError } = await supabase
         .from('salaries')
         .select('employee_name, salary_amount, month')
